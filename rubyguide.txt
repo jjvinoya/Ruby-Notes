@@ -1,0 +1,306 @@
+--------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------Ruby Notes-----------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+- Is an "interpreted" programming language which means you can't run on your processor, need to use a virtual machine
+- Write once, and can have it execute on many different OS and hardwares
+
+# Code Block
+	#1. {} Mostly used as a one-liner
+	{ puts 'Hi' }
+	#2. do end
+	do 
+	  puts 'Hi'
+	end
+
+# Proc
+	#1. Proc.new followed by a code block
+	Proc.new { puts 'Hi' }
+	Proc.new do
+	  puts 'Hi'
+	end
+	#2. proc followed by a code block
+	proc { puts 'Hi' }
+	proc do
+	  puts 'Hi'
+	end
+
+	# example: arguments are wrapped between ||
+	times_2 = proc { |num| num * 2 }
+
+# Lambda
+	# 1. lambda followed by a code block
+	lambda { puts 'Hi' }
+	lambda do
+	  puts 'Hi'
+	end
+	#2. -> (stabby lambda)
+	-> { puts 'Hi' }
+	-> do
+	  puts 'Hi'
+	end
+	#example: -> takes argument outside of {}
+	times_2 = -> (num) { num * 2 }
+
+Backticks: call a system program and returns it's output, as opposed to the first approach, the command is not provide
+through a string, but by putting it inside a backticks pair
+
+$?   - The global variable is set through the backticks, too. With backticks you can also make use of string interoplation
+%x() - This is an alternative to the backticks style, it will return the output too
+
+--------------------------------------------------------------------------------------------------------------------
+------------------------------------------Printing------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+
+puts "Hello there!"
+-Puts automatically adds a new line at the end of your message every time you use it
+
+ex.
+	puts "123"
+	puts "456"
+123
+456
+
+print "Hello there!"
+-Print does not add a new line, next time you print it will on the same line as your last 
+
+ex. 
+	print 123
+	print 456
+	print 789
+
+123456789
+
+Printing w/Array:
+
+puts [1,2]
+1
+2
+print [1,2]
+[1,2]
+
+- Puts attempts to convert everything into a string(by calling to_s)
+	Why is that important?
+Because if you're trying to Puts an array with nil(null) values... It shows blank lines!!!!!
+
+puts [1,nil,nil,2]
+1
+
+2
+
+Summary: 
+	puts&print
+		- convert things to strings, even if that means an empty string
+	puts
+		- adds a new line to the end of your messages
+		- displays array elements one-per-line
+
+What about p?
+
+	puts vs. p
+		- p is a method that shows more "raw" version of an object
+		- puts always returns nil
+		- p returns the object you pass to it
+ex.
+	>puts "Ruby Is Cool"	
+	Ruby Is Cool
+
+	>p "Ruby Is Cool"
+	"Ruby Is Cool"
+
+	Technical
+		- If you try to puts a variable at the last line of a method, you're using the return value of that method
+ex.
+	def numbers
+		puts 123
+	end
+
+	numbers
+	# nil
+		- The numbers method will display 123 on the screen, but its return value will be nil
+
+	If you try:
+	
+	result = numbers
+		- the result will be nil, instead of 123
+		- if you use p, it will work
+
+Pretty Printing: pp
+		- Like p, but prints big hashes & arrays in a nicer way
+
+----------------------------------------------------End of Printing-------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+----------------------------------------------Pulling info from hashes key value------------------------------------
+{key:value} or {'key'=>'value'}
+
+ex.
+
+	furniture = [
+		{"name" => "bed", "color" => "black", "size" => "12",
+		"date_Created" => "126", "condition" => "New"},
+		{"name" => "chair", "color" => "brown", "size" => "7",
+		"date_Created" => "6/13", "condition" => "Used"},
+		{"name" => "desk", "color" => "maple", "size" => "9",
+		"date_Created" => "2/13", "condition" => "New"}
+		]
+
+How to print/pull values
+
+begining way:
+
+ex.
+	furniture_values = (furniture.map {|furn| [furn["name"],
+	furn["color"], furn["size"], furn["date_created"],
+	furn["condition"]]})
+
+	p furniture_values
+
+prints:
+
+	[["bed", "black", "12", "12/6", "New"], ["chair", "brown", "7",
+	"6/13", "Used"], ["desk", "maple", "9", "2/13", "new"]]
+
+faster way:
+
+ex. 
+	p furniture.map {|x| x.values}
+
+prints:
+
+	[["bed", "black", "12", "12/6", "New"], ["chair", "brown", "7",
+	"6/13", "Used"], ["desk", "maple", "9", "2/13", "new"]]
+		
+		=or=
+
+	p furniture.map {|x| x.keys}.uniq
+
+		- .uniq is a function that erases all duplicate keys or values
+		- in this case it prints all the keys
+Other:
+
+	p furniture.map {|x| x.values[0]}
+prints:
+	["bed","chair","desk"]
+
+	p furniture.map {|x| x.keys}
+prints: 
+	["name", "color", "size", "date_created", "condition"]
+
+--------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------Ruby Expressions-----------------------------------------------------
+-------------------------------------------------(ruby regex)-------------------------------------------------------
+
+Regular expressions:
+		- ruby expressions are dedfined between two forward slashes /RightHere/
+		- to differentiate them from other language syntax
+		- most simple experssions match a word or even a single letter
+ex.
+	# Find the word 'like'
+	"Do you like cats?" =~ /like/
+Returns:
+	- this returns the index of the first occurrence of the word if it was found of nil(null) otherwise.
+	- if we don't care about the index we could use the String#include? method
+
+Match method:
+	- Another way to check if a string matches a regex is to use the match method
+ex.
+	if "Do you like cats?".match(/like/)
+	     puts "Match found!"
+	end
+
+Character Classes:
+	- A character class lets you define a range or a list of characters to match 
+	- [aeiou] matches any vowel
+ex.
+	def contains_vowel(str)
+	     str =~ /[aeious]/
+	end
+
+	contains_vowel("test") # returns 1, returned the index
+	contains_vowel("sky") # returns nil
+
+** does not take into account the amount of characters **
+
+Ranges:
+	- Use ranges to match multiple letters or numbers without having to type them all out
+	- [2-5] is the same as [2345]
+
+	Useful Ranges:
+		- [0-9] matches any number 0 to 9
+		- [a-z] matches any letter from a to z no caps
+		- [^a-z] negated range
+ex.
+	def contains_number(str)
+	     str=~ /[0-9]/
+	end
+	
+	contains_numbers("The year is 2015") # returns 12, index
+	contains_numbers("The cat is black") # returns nil
+
+** The return value when using '=~' is either the string index or 'nil' **
+
+	Shorthand index:
+		- \w is equivalent to [0-9a-zA-Z_]
+		- \d is the same as [0-9]
+		- \s matches white space(tabs, regular space, newline)
+	Negative forms of these:
+		- \W anything that's not in [0-9a-zA-Z_]
+		- \D anything that's not a number
+		- \S anything that's not a space
+
+** The dot character . matches everything but new lines. If you need to use a literal . then you will have to escape it **
+
+Modifiers:
+	- Match multiple characters we can use pattern modifiers
+
+	Modifer:
+	+	- 1 or more
+	*	- 0 or more
+	?	- 0 or 1
+	{3,5}	- between 3 and 5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------Links--------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+https://www.rubyguides.com/2018/10/puts-vs-print/
+https://www.rubyguides.com/
+https://codeburst.io/ruby-shortcuts-pulling-info-from-hashes-values-keys-1d6ba0256b2d
+https://docs.ruby-lang.org/en/2.0.0/index.html
+http://ruby-for-beginners.rubymonstas.org/index.html
+http://www.evc-cit.info/cit020/beginning-programming/chp_06/array_params.html
+https://apidock.com/ruby/v2_5_5/Array/new/class
+https://www.tutorialspoint.com/ruby/index.htm
+https://simpleror.wordpress.com/2009/03/15/q-q-w-w-x-r-s/
